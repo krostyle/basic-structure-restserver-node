@@ -1,18 +1,29 @@
 //TRUCAZO
 const { response, request } = require('express')
+const bcrypt = require('bcryptjs');
+const User = require('../models/user');
+
 
 
 const getUsers = (req = request, res = response) => {
-    const query = req.query;
     res.json({
         msg: 'Get API Controller',
-        query
     })
 }
 
-const postUsers = (req = request, res = response) => {
+const createUser = async(req = request, res = response) => {
+
+    const { name, email, password, role } = req.body;
+    const user = new User({ name, email, password, role });
+
+    //Encriptar password
+    const salt = bcrypt.genSaltSync();
+    user.password = bcrypt.hashSync(password, salt);
+
+    await user.save();
     res.json({
-        msg: 'Post API Controller'
+        msg: 'Post API Controller',
+        user
     })
 }
 const putUsers = (req = request, res = response) => {
@@ -35,7 +46,7 @@ const getDelete = (req = request, res = response) => {
 
 module.exports = {
     getUsers,
-    postUsers,
+    createUser,
     putUsers,
     patchUsers,
     getDelete
