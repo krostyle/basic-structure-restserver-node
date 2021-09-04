@@ -3,14 +3,6 @@ const { response, request } = require('express')
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-
-
-const getUsers = (req = request, res = response) => {
-    res.json({
-        msg: 'Get API Controller',
-    })
-}
-
 const createUser = async(req = request, res = response) => {
 
     const { name, email, password, role } = req.body;
@@ -22,33 +14,58 @@ const createUser = async(req = request, res = response) => {
 
     await user.save();
     res.json({
-        msg: 'Post API Controller',
+        msg: 'POST Usuario creado correctamente',
         user
     })
 }
-const putUsers = (req = request, res = response) => {
+
+const updateUser = async(req = request, res = response) => {
     const { id } = req.params;
+    const { _id, password, google, ...rest } = req.body;
+    //VALIDAR EN LA BASE DE DATOS
+    if (password) {
+        const salt = bcrypt.genSaltSync();
+        rest.password = bcrypt.hashSync(password, salt);
+    }
+    const user = await User.findByIdAndUpdate(id, rest);
+
     res.json({
-        msg: 'Put API Controller',
-        id
+        msg: 'PUT Usuario actualizado correctamente',
+        user
     })
 }
-const patchUsers = (req = request, res = response) => {
+
+
+const getUsers = async(req = request, res = response) => {
+    const { limit = 10, skip = 0 } = req.query;
+    const query = { state: true };
+
+    const usersPromise = User.find(query)
+        .limit(Number(limit))
+        .skip(Number(skip));
+    const totalPromise = User.countDocuments(query);
+
+    const [users, total] = await Promise.all([usersPromise, totalPromise]);
+
     res.json({
-        msg: 'Patch API Controller'
+        total,
+        users
     })
 }
-const getDelete = (req = request, res = response) => {
+
+const deleteUser = async(req = request, res = response) => {
+    const { id } = req.params;
+    const user = await User.findByIdAndUpdate(id, { state: false });
     res.json({
-        msg: 'Delete API Controller'
+        msg: 'DELETE Usuario eliminado correctamente',
+        user
     })
 }
+
 
 module.exports = {
-    getUsers,
     createUser,
-    putUsers,
-    patchUsers,
-    getDelete
-
+    updateUser,
+    getUsers,
+    deleteUser
 }
