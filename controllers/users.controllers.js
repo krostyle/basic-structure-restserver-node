@@ -28,7 +28,7 @@ const updateUser = async(req = request, res = response) => {
         rest.password = bcrypt.hashSync(password, salt);
     }
     const user = await User.findByIdAndUpdate(id, rest);
-
+    console.log(user);
     res.json({
         msg: 'PUT Usuario actualizado correctamente',
         user
@@ -55,11 +55,19 @@ const getUsers = async(req = request, res = response) => {
 
 const deleteUser = async(req = request, res = response) => {
     const { id } = req.params;
-    const user = await User.findByIdAndUpdate(id, { state: false });
-    res.json({
-        msg: 'DELETE Usuario eliminado correctamente',
-        user
-    })
+    const userDeleted = await User.findByIdAndUpdate(id, { state: false });
+    const userAuth = req.user;
+
+    if (userAuth.role === 'ADMIN') {
+        res.json({
+            msg: 'User deleted successfully',
+            userDeleted
+        })
+    } else {
+        res.json({
+            msg: 'You do not have permissions to delete users'
+        })
+    }
 }
 
 
