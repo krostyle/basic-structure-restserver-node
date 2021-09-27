@@ -5,12 +5,64 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Denegado</title>
+    <title>Google Sing In</title>
 </head>
 
 <body>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload" data-client_id="1080989045872-4e8c4gccj0iv7t7888mmcee4d51f5agq.apps.googleusercontent.com" data-login_uri="/" data-auto_prompt="false" data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
+    </div>
+    <button id="google_signout">
+        Sign Out
+    </button>
 
-    <h1>Accesos Denegado</h1>
+    <script>
+        function handleCredentialResponse(response) {
+            // decodeJwtResponse() is a custom function defined by you
+            // to decode the credential response.
+            //    const responsePayload = decodeJwtResponse(response.credential);
+
+            //Google Token : ID_TOKEN
+            // console.log('Token : ', response.credential);
+            const data = {
+                id_token: response.credential,
+            };
+            fetch('http://localhost:8080/api/auth/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    cache: 'default',
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    localStorage.setItem('email', data.user.email);
+                })
+                .catch(error => console.error('Error:', error));
+
+
+
+            //    console.log("ID: " + responsePayload.sub);
+            //    console.log('Full Name: ' + responsePayload.name);
+            //    console.log('Given Name: ' + responsePayload.given_name);
+            //    console.log('Family Name: ' + responsePayload.family_name);
+            //    console.log("Image URL: " + responsePayload.picture);
+            //    console.log("Email: " + responsePayload.email);
+        }
+
+        const signOutButton = document.getElementById('google_signout');
+        signOutButton.addEventListener('click', () => {
+            google.accounts.id.revoke(localStorage.getItem('email'), done => {
+                localStorage.clear();
+                location.reload();
+            });
+        })
+    </script>
 
 </body>
 
