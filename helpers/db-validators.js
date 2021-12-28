@@ -27,11 +27,11 @@ const isUserExist = async(id = '') => {
 
 //VERIFICAR SI CATEGORIA EXISTE
 const isCategoryExist = async(id = '') => {
-    const categoryExist = await Category.findById(id);
-    if (!categoryExist) {
-        throw new Error(`Category with ID: ${id} does not exist`);
-    } else {
-        console.log('entra aqui');
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        const categoryExist = await Category.findById(id);
+        if (!categoryExist) {
+            throw new Error(`Category with ID: ${id} does not exist`);
+        }
     }
 }
 

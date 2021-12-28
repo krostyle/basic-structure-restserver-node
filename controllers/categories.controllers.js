@@ -67,9 +67,30 @@ const getCategory = async(req, res) => {
     }
 }
 
-const updateCategory = async(req, res) => {}
+const updateCategory = async(req, res) => {
+    try {
+        const { id } = req.params;
+        const { state, user, ...data } = req.body;
+        data.name = data.name.toUpperCase();
+        data.user = req.user._id;
+        const category = await Category.findByIdAndUpdate(id, data, { new: true })
+        res.json(category)
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server error');
+    }
+}
 
-const deleteCategory = async(req, res) => {}
+const deleteCategory = async(req, res) => {
+    try {
+        const { id } = req.params;
+        const category = await Category.findByIdAndUpdate(id, { state: false }, { new: true });
+        res.json(category)
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server error');
+    }
+}
 
 
 
