@@ -33,7 +33,6 @@ const createCategory = async(req, res) => {
 
 const getCategories = async(req, res) => {
     try {
-        console.log(req.query);
         const { limit = 5, skip = 0 } = req.query;
         const query = { state: true };
 
@@ -50,7 +49,7 @@ const getCategories = async(req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error');
+        res.status(500).send('Server error, error while getting categories');
     }
 }
 

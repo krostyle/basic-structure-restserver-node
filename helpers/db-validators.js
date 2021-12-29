@@ -1,6 +1,7 @@
 const Role = require('../models/role');
 const User = require('../models/user');
 const Category = require('../models/category');
+const Product = require('../models/product');
 //VERIFICAR SI ES UN ROL VALIDO
 const isRoleValid = async(role = '') => {
     const roleExist = await Role.findOne({ role });
@@ -35,10 +36,20 @@ const isCategoryExist = async(id = '') => {
     }
 }
 
+const isProductExist = async(id = '') => {
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        const productExist = await Product.findById(id);
+        if (!productExist) {
+            throw new Error(`Product with ID: ${id} does not exist`);
+        }
+    }
+}
+
 
 module.exports = {
     isRoleValid,
     isEmailExist,
     isUserExist,
-    isCategoryExist
+    isCategoryExist,
+    isProductExist
 }
