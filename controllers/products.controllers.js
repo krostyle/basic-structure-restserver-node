@@ -81,7 +81,6 @@ const deleteProduct = async(req, res) => {
     try {
         const { id } = req.params;
         const product = await Product.findByIdAndUpdate(id, { state: false }, { new: true });
-        await product.save();
         res.json({
             message: "Product deleted successfully",
             product
